@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
+const authRouter = require("./routes/auth");
 
 const app = express();
 
@@ -31,6 +31,6 @@ app.use(
 app.use(cookieParser());
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/auth", authRouter);
 
 module.exports = app;
