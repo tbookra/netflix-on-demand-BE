@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
     if (!comperdPassword)
       return res.json({ error: "Email or Password are invalid" });
     const token = await JWT.generateToken(user._id, rememberMe);
-    res.header("AuthToken", token).json(token);
+    res.header("AuthToken", token).json({ token });
   } catch (err) {
     res.json(err);
   }
