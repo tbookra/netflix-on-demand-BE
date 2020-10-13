@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
+const tokenVerify = require("../middleware/tokenVerify");
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get("/", tokenVerify, async (req, res) => {
+  console.log(req.user_id);
+  res.send("INDEX");
 });
 
 module.exports = router;
