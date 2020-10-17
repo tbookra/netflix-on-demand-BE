@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
+const userApiRouter = require('./routes/api/user');
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
+app.use("/getuser", userApiRouter);
 
 module.exports = app;
