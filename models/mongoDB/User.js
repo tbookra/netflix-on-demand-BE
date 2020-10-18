@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const movie = new mongoose.Schema({
+  movieId:{
+    type:Number,
+    max:255
+  }
+})
+
 const userSChema = new mongoose.Schema({
   full_name: {
     type: String,
@@ -16,6 +23,13 @@ const userSChema = new mongoose.Schema({
     required: true,
     max: 1024,
   },
+  isMember:{
+    type:Boolean,
+    default:false
+  },
+
+  purchasedMovies:[movie],
+
   registrationDate: {
     type: Date,
     default: Date.now,

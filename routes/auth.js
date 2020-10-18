@@ -30,16 +30,11 @@ router.post("/login", async (req, res) => {
   try {
     await loginValidation(req.body);
     const user = await User.findOne({ email });
-    req.session.currentUser = user;
-    console.log('userrr', user.full_name);
     if (!user) return res.json({ error: "Email or Password are invalid" });
     let comperdPassword = await bcrypt.checkPassword(password, user.password);
     if (!comperdPassword)
       return res.json({ error: "Email or Password are invalid" });
     const token = await JWT.generateToken(user._id, rememberMe);
-    console.log('gggggg', req.session.currentUser)
-    
-    
     res.header("AuthToken", token).json({ token });
   } catch (err) {
     res.json(err);

@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   if (!token) return res.send("Access Denied");
   try {
     const verified = await jwt.verifyToken(token);
-    req.user_id = verified;
+    req.session.user_id = verified._id;
     next();
   } catch (err) {
     res.send("Invalid Token");
