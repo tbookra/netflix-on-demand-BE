@@ -8,11 +8,12 @@ const {movieId} = req.params
 const {user_id} = req.session
 try{
 const user = await User.findById(user_id)
+if(user.isMember) return res.json({isMovieAccessible:true})
 const movies = await user.get('purchasedMovies')
-const isMovieInList = movies.filter(movie=>movie.movieId==movieId)
-console.log(isMovieInList)
-console.log(user)
-console.log(movies)
+const isMovieInList = movies.filter(movie=>movie.movieId===movieId)
+console.log('isInMovie',isMovieInList)
+if(isMovieInList.length===0) return res.json({isMovieAccessible:false})
+else return res.json({isMovieAccessible:true})
 }catch(err){
     console.log(err)
 }
@@ -23,10 +24,17 @@ router.post('/addMovie', async(req,res)=>{
     const {user_id} = req.session
     try{
         const user = await User.findById(user_id)
-        console.log(user.purchasedMovies)
-        user.purchasedMovies=[...purchasedMovies, {movieId}]
+       
+        const isMovieInList = user.purchasedMovies.filter(movie=>movie.movieId===movieId)
+        if(isMovieInList.length===0){
+            user.purchasedMovies=[...user.purchasedMovies, {movieId}]
         await user.save()
-        // console.log(user.purchasedMovies)
+        res.json({added:true})
+        }else{
+         res.json({added:false})
+        }
+        
+        console.log(user.purchasedMovies)
     }catch(err){
         console.log(err)
     }

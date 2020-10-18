@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const movie = new mongoose.Schema({
   movieId:{
-    type:Number,
+    type:String,
     max:255
   }
 })
