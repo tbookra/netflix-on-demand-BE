@@ -4,7 +4,7 @@ const userschema = require('../../models/mongoDB/User');
 
 
 
-router.post("/", async (req, res) => {
+router.post("/getUser", async (req, res) => {
     try {
         const {email} = req.body;
         let currentUser = await userschema.findOne({email});
