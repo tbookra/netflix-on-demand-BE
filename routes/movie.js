@@ -12,8 +12,8 @@ if(user.isMember) return res.json({isMovieAccessible:true})
 const movies = await user.get('purchasedMovies')
 const isMovieInList = movies.filter(movie=>movie.movieId===movieId)
 console.log('isInMovie',isMovieInList)
-if(isMovieInList.length===0) return res.json({isMovieAccessible:false})
-else return res.json({isMovieAccessible:true})
+if(isMovieInList.length===0) res.json({isMovieAccessible:false})
+else  res.json({isMovieAccessible:true})
 }catch(err){
     console.log(err)
 }
