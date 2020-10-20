@@ -7,13 +7,13 @@ router.get('/checkIfMovieAccessible/:movieId', async(req,res)=>{
 const {movieId} = req.params
 const {user_id} = req.session
 try{
-const user = await User.findById(user_id)
-if(user.isMember) return res.json({isMovieAccessible:true})
-const movies = await user.get('purchasedMovies')
-const isMovieInList = movies.filter(movie=>movie.movieId===movieId)
-console.log('isInMovie',isMovieInList)
-if(isMovieInList.length===0) res.json({isMovieAccessible:false})
-else  res.json({isMovieAccessible:true})
+    const user = await User.findById(user_id)
+    if(user.isMember) return res.json({isMovieAccessible:true})
+    const purchasedMovies = await user.get('purchasedpurchasedMovies')
+    const isMovieInList = purchasedMovies.filter(movie=>movie.movieId===movieId)
+    console.log('isInMovie',isMovieInList)
+    if(isMovieInList.length===0) res.json({isMovieAccessible:false})
+    else  res.json({isMovieAccessible:true})
 }catch(err){
     console.log(err)
 }

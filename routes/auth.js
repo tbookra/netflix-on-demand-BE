@@ -18,7 +18,6 @@ router.post("/register", async (req, res) => {
       password: hashPassword,
     }).save();
     const token = await JWT.generateToken(user._id, rememberMe);
-    req.session.username = user;
     res.header("AuthToken", token).json({ token });
   } catch (err) {
     res.json(err);

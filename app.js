@@ -8,7 +8,6 @@ require("dotenv").config();
 
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
-const userApiRouter = require('./routes/api/user');
 const movieRouter = require('./routes/movie');
 
 const tokenVerify = require('./middleware/tokenVerify')
@@ -39,6 +38,6 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
 app.use("/movie",tokenVerify, movieRouter);
-app.use("/getuser", userApiRouter);
+
 
 module.exports = app;
