@@ -9,7 +9,7 @@ const {user_id} = req.session
 try{
     const user = await User.findById(user_id)
     if(user.isMember) return res.json({isMovieAccessible:true})
-    const purchasedMovies = await user.get('purchasedpurchasedMovies')
+    const purchasedMovies = await user.get('purchasedMovies')
     const isMovieInList = purchasedMovies.filter(movie=>movie.movieId===movieId)
     console.log('isInMovie',isMovieInList)
     if(isMovieInList.length===0) res.json({isMovieAccessible:false})
