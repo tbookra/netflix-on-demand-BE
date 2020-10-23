@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
       password: hashPassword,
     }).save();
     const token = await JWT.generateToken(user._id, rememberMe);
-    res.header("AuthToken", token).json({ token });
+    res.header("AuthToken", token).json({ token, userName:full_name });
   } catch (err) {
     res.json(err);
   }
@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
     if (!comperdPassword)
       return res.json({ error: "Email or Password are invalid" });
     const token = await JWT.generateToken(user._id, rememberMe);
-    res.header("AuthToken", token).json({ token });
+    res.header("AuthToken", token).json({ token, userName:user.full_name });
   } catch (err) {
     res.json(err);
   }
