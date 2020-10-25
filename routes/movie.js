@@ -19,6 +19,18 @@ try{
 }
 })
 
+router.get('/getAccessibleMovies', async(req,res)=>{
+const {user_id} = req.session
+try{
+    const user = await User.findById(user_id)
+    const isMember = await user.get('isMember')
+    const purchasedMovies = await user.get('purchasedMovies')
+    res.json({isMember, purchasedMovies})
+}catch(err){
+    console.log(err)
+}
+})
+
 router.post('/addMovie', async(req,res)=>{
     const {movieId} = req.body
     const {user_id} = req.session
