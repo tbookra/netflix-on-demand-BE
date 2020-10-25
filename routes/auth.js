@@ -18,7 +18,9 @@ router.post("/register", async (req, res) => {
       password: hashPassword,
     }).save();
     const token = await JWT.generateToken(user._id, rememberMe);
+
     res.status(200).header("AuthToken", token).json({ token, userName:full_name });
+
   } catch (err) {
     res.status(500).json(err);
   }
@@ -29,12 +31,16 @@ router.post("/login", async (req, res) => {
   try {
     await loginValidation(req.body);
     const user = await User.findOne({ email });
+
     if (!user) return res.status(400).json({ error: "Email or Password are invalid" });
+
     let comperdPassword = await bcrypt.checkPassword(password, user.password);
     if (!comperdPassword)
       return res.status(400).json({ error: "Email or Password are invalid" });
     const token = await JWT.generateToken(user._id, rememberMe);
+
     res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+
   } catch (err) {
     res.status(500).json(err);
   }
