@@ -8,7 +8,9 @@ require("dotenv").config();
 
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
-const userApiRouter = require('./routes/api/user');
+const movieRouter = require('./routes/movie');
+
+const tokenVerify = require('./middleware/tokenVerify')
 
 const app = express();
 
@@ -16,13 +18,13 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
-});
+})
 mongoose.connection.on("connected", () => {
   console.log("Connected to MONGO");
-});
+})
 mongoose.connection.on("error", (err) => {
   console.log("error connecting to MONGO", err);
-});
+})
 
 app.use(logger("dev"));
 app.use(cors());
@@ -35,6 +37,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
-app.use("/getuser", userApiRouter);
+app.use("/movie",tokenVerify, movieRouter);
+
 
 module.exports = app;
