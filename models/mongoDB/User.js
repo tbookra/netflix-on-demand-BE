@@ -7,7 +7,7 @@ const movie = new mongoose.Schema({
   }
 })
 
-const userSChema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   full_name: {
     type: String,
     required: true,
@@ -36,4 +36,4 @@ const userSChema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("User", userSChema);
+module.exports = mongoose.model("User", userSchema);
