@@ -10,7 +10,7 @@ router.post("/register", async (req, res) => {
   try {
     await registerValidation(req.body);
     const emailExist = await User.findOne({ email });
-    if (emailExist) return res.status(400).json({ error: "Email already exists" });
+    if (emailExist) return res.json({ error: "Email already exists" });
     const hashPassword = await bcrypt.hashPassword(password);
     const user = await new User({
       full_name,
@@ -32,11 +32,11 @@ router.post("/login", async (req, res) => {
     await loginValidation(req.body);
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(400).json({ error: "Email or Password are invalid" });
+    if (!user) return res.json({ error: "Email or Password are invalid" });
 
     let comperdPassword = await bcrypt.checkPassword(password, user.password);
     if (!comperdPassword)
-      return res.status(400).json({ error: "Email or Password are invalid" });
+      return res.json({ error: "Email or Password are invalid" });
     const token = await JWT.generateToken(user._id, rememberMe);
 
     res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
