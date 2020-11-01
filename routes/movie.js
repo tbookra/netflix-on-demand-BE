@@ -1,13 +1,18 @@
 const router = require("express").Router();
 const User = require('../models/mongoDB/User')
 
-router.get('/getAccessibleMovies', async(req,res)=>{
+
+router.get('/checkIfMovieAccessible/:movieId', async(req,res)=>{
     const {user_id} = req.session
+    const {movieId} = req.params
     try{
         const user = await User.findById(user_id)
         const isMember = await user.get('isMember')
+        if(isMember) return res.json({isMovieAccessible:true})
         const purchasedMovies = await user.get('purchasedMovies')
-        res.status(200).json({isMember, purchasedMovies})
+        let isMovieAccessible = purchasedMovies.some((movie)=>movie.movieId==movieId)
+        if(isMovieAccessible) res.json({isMovieAccessible:true})
+        else res.json({isMovieAccessible:false})
     }catch(err){
         console.log(err)
     }
