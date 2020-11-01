@@ -39,5 +39,9 @@ router.post('/addMovie', async(req,res)=>{
 
 })
 
+router.post('/buyMembership', async(req,res)=>{
+    //change user membership and validate
+})
+
 
 module.exports = router;
