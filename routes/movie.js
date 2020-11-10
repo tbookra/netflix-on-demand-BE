@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const movieController = require('../controllers/movieController');
-
+const Users = require('../models/mongoDB/User');
 
 router.get('/checkIfMovieAccessible/:movieId', movieController.getMovie)
 
