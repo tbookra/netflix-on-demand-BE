@@ -1,13 +1,9 @@
-const express = require("express");
-const router = express.Router();
-
 const User = require("../models/mongoDB/User");
 const registerValidation = require("../validation/registerSchema");
 const loginValidation = require("../validation/loginSchema");
 const newPasswordValidation = require("../validation/newPasswordSchema");
 const bcrypt = require("../auth/bcrypt");
 const JWT = require("../auth/jwt");
-const passwordToModify = require('../middleware/passwordToModify');
 
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
