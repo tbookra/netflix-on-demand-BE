@@ -7,14 +7,16 @@ const DAYS_TO_PASSWORD_MODIFFICATION = process.env.PASSWORD_TO_MODIFY;
 router.get('/checkIfMovieAccessible/:movieId', async(req,res)=>{
     const {user_id} = req.session
     const {movieId} = req.params
-    console.log('hello from here',DAYS_TO_PASSWORD_MODIFFICATION)
+    console.log('hello from movie.js',DAYS_TO_PASSWORD_MODIFFICATION)
     try{
         const user = await User.findById(user_id)
+
         let LastPasswordModification = user.passwordLastModified / DATE_TO_DAYS;
         let today = new Date() / DATE_TO_DAYS;
-        let dif = today - LastPasswordModification;
+        let dif = today - LastPasswordModification; // the time elapsed from the last password modification
         console.log('dif', (dif > DAYS_TO_PASSWORD_MODIFFICATION))
-        if(dif > DAYS_TO_PASSWORD_MODIFFICATION) return res.json({isMovieAccessible:"change password"})
+        if(dif > DAYS_TO_PASSWORD_MODIFFICATION) return res.json({isMovieAccessible:"password"})
+
         const isMember = await user.get('isMember')
         if(isMember) return res.json({isMovieAccessible:true})
         const purchasedMovies = await user.get('purchasedMovies')

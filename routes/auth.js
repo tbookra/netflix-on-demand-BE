@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const loginController = require('../controllers/login');
+const authController = require('../controllers/authController');
 const User = require("../models/mongoDB/User");
 const registerValidation = require("../validation/registerSchema");
 const loginValidation = require("../validation/loginSchema");
@@ -8,10 +8,10 @@ const JWT = require("../auth/jwt");
 const passwordToModify = require('../middleware/passwordToModify');
 
 
-router.post("/register", loginController.register);
+router.post("/register", authController.register);
 
-router.post("/login",passwordToModify, loginController.login);
+router.post("/login",passwordToModify, authController.login);
 
-router.post("/newPassword", loginController.newPassword);
+router.post("/newPassword", authController.newPassword);
 
 module.exports = router;
