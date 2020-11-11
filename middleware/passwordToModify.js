@@ -1,13 +1,13 @@
-const Users = require('../models/mongoDB/User');
+const Users = require('../models/mongoDB/User'); 
 
 module.exports = async (req, res, next) => {
+  const {user_id} = req.session
+  const {email} = req.body
   console.log('reqq',req.session)
   try{
+    const user1 = user_id ? await Users.findById(user_id) : await Users.findOne({email:email});
     const DATE_TO_DAYS = 60 * 60 * 24 * 1000;
     const DAYS_TO_PASSWORD_MODIFFICATION = process.env.PASSWORD_TO_MODIFY;
-    const {email} = req.body;
-    let user1 = await Users.findOne({email:email});
-    console.log('user1', user1)
     let LastPasswordModification =
     user1.passwordLastModified / DATE_TO_DAYS;
     let today = new Date() / DATE_TO_DAYS;
@@ -17,8 +17,13 @@ module.exports = async (req, res, next) => {
       req.session.changePassword = false; // meens no need to change password
     } else {
       req.session.changePassword = true; // meens that password should change
-      return res.json({ error: "need to change password" });
-    }
+      if(email) {
+        return res.json({ error: "need to change password" })
+      } else {
+        return res.json({isMovieAccessible:"password"})
+      }
+      };
+    
     next()
   }catch (e) {
     console.log(e);

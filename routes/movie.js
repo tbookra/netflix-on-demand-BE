@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const movieController = require('../controllers/movieController');
-const Users = require('../models/mongoDB/User');
+const passwordToModify = require('../middleware/passwordToModify');
 
-router.get('/checkIfMovieAccessible/:movieId', movieController.getMovie)
+router.get('/checkIfMovieAccessible/:movieId',passwordToModify, movieController.getMovie)
 
 router.post('/addMovie', movieController.addMovie)
 
