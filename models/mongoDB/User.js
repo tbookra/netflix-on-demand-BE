@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
+  
 
   purchasedMovies:[movie],
 
@@ -34,6 +35,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  passwordLastModified: {
+    type: Date,
+    
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
