@@ -5,6 +5,7 @@ const newPasswordValidation = require("../validation/newPasswordSchema");
 const bcrypt = require("../auth/bcrypt");
 const JWT = require("../auth/jwt");
 const e = require("express");
+const nodemailer = require('../auth/nodeMailer');
 
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
@@ -20,6 +21,7 @@ const e = require("express");
         passwordLastModified: Date.now(),
       }).save();
       const token = await JWT.generateToken(user._id, rememberMe);
+      await nodemailer.sendEmail(email, "register");
       res.status(200).header("AuthToken", token).json({ token, userName:full_name });
   
     } catch (err) {
@@ -29,6 +31,7 @@ const e = require("express");
   
   const login = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
+    console.log(email)
     try {
         await loginValidation(req.body);
         const user = await Users.findOne({ email });
@@ -40,7 +43,8 @@ const e = require("express");
         if(req.session.changePassword){
         return res.json({ error: "need to change password" });
         } else {
-            res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+         await nodemailer.sendEmail(email, "register");
+          res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
         }
         next()
     } catch (e) {
@@ -60,6 +64,7 @@ const e = require("express");
         const token = await JWT.generateToken(user._id, false);
         req.session.changePassword = false;
         await Users.updateOne({email: email},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
+        await nodemailer.sendEmail(email, "password");
         res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
      
         next()
