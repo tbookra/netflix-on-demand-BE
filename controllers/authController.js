@@ -9,20 +9,23 @@ const nodemailer = require('../auth/nodeMailer');
 
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
+    module.exports.newUserValues = req.body;
+    const user = {
+      full_name,
+      email
+    };
      try {
       await registerValidation(req.body);
       const emailExist = await Users.findOne({ email });
       if (emailExist) return res.json({ error: "Email already exists" });
-      const hashPassword = await bcrypt.hashPassword(password);
-      const user = await new Users({
-        full_name,
-        email,
-        password: hashPassword,
-        passwordLastModified: Date.now(),
-      }).save();
-      const token = await JWT.generateToken(user._id, rememberMe);
-      await nodemailer.sendEmail(email, "register");
-      res.status(200).header("AuthToken", token).json({ token, userName:full_name });
+      await nodemailer.sendEmail(user, "register");
+      res.json({confirm: 'confirm'})
+
+
+      
+      // const token = await JWT.generateToken(user._id, rememberMe);
+      // await nodemailer.sendEmail(email, "register");
+      // res.status(200).header("AuthToken", token).json({ token, userName:full_name });
   
     } catch (err) {
       res.status(500).json(err);
@@ -31,7 +34,7 @@ const nodemailer = require('../auth/nodeMailer');
   
   const login = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
-    module.exports.newUserValues = req.body;
+    
     
     try {
         await loginValidation(req.body);
@@ -40,14 +43,13 @@ const nodemailer = require('../auth/nodeMailer');
         let comperdPassword = await bcrypt.checkPassword(password, user.password);
         if (!comperdPassword)
         return res.json({ error: "Email or Password are invalid" });
-        // const token = await JWT.generateToken(user._id, rememberMe);
+        const token = await JWT.generateToken(user._id, rememberMe);
         if(req.session.changePassword){
         return res.json({ error: "need to change password" });
         } else {
          
-          await nodemailer.sendEmail(user, "register");
-          res.json({confirm: 'confirm'})
-            // res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+          
+            res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
         
             
         }
@@ -96,8 +98,16 @@ const nodemailer = require('../auth/nodeMailer');
     try{
       // console.log('req.session.values',module.exports.newUserValues)
       const values = module.exports.newUserValues;
-      let user = await Users.findOne({ email:values.email });
-      console.log('user', user)
+      const {full_name,email,password} = values
+      // let user = await Users.findOne({ email:values.email });
+      // console.log('user', user)
+      const hashPassword = await bcrypt.hashPassword(password);
+      const user = await new Users({
+        full_name,
+        email,
+        password: hashPassword,
+        passwordLastModified: Date.now(),
+      }).save();
       // console.log('const', values.email, values.password) 
       const token = await JWT.generateToken(user._id, false);
      console.log('token', token, user.full_name);
