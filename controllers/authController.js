@@ -31,7 +31,8 @@ const nodemailer = require('../auth/nodeMailer');
   
   const login = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
-    console.log(email)
+    module.exports.newUserValues = req.body;
+    
     try {
         await loginValidation(req.body);
         const user = await Users.findOne({ email });
@@ -39,12 +40,16 @@ const nodemailer = require('../auth/nodeMailer');
         let comperdPassword = await bcrypt.checkPassword(password, user.password);
         if (!comperdPassword)
         return res.json({ error: "Email or Password are invalid" });
-        const token = await JWT.generateToken(user._id, rememberMe);
+        // const token = await JWT.generateToken(user._id, rememberMe);
         if(req.session.changePassword){
         return res.json({ error: "need to change password" });
         } else {
-         await nodemailer.sendEmail(email, "register");
-          res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+         
+          await nodemailer.sendEmail(user, "register");
+          res.json({confirm: 'confirm'})
+            // res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+        
+            
         }
         next()
     } catch (e) {
@@ -73,6 +78,37 @@ const nodemailer = require('../auth/nodeMailer');
     }
   };
 
+  const userConfirmation = async (req, res, next) => {
+    const {email} = req.params;
+    try{
+      let user = await Users.findOne({ email });
+      const token = await JWT.generateToken(user._id, false);
+      req.session.emailConfirmed = user;
+      // console.log(' req.session.emailConfirmed', req.session.emailConfirmed)
+      res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+    }catch(e){
+      console.log(e)
+    }
+  }
+
+  const confirmed  = async (req, res, next) => {
+   
+    try{
+      // console.log('req.session.values',module.exports.newUserValues)
+      const values = module.exports.newUserValues;
+      let user = await Users.findOne({ email:values.email });
+      console.log('user', user)
+      // console.log('const', values.email, values.password) 
+      const token = await JWT.generateToken(user._id, false);
+     console.log('token', token, user.full_name);
+      res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+    }catch(e){
+      console.log(e)
+    }
+  }
+
   module.exports.register = register;
   module.exports.login = login;
   module.exports.newPassword = newPassword;
+  module.exports.userConfirmation = userConfirmation;
+  module.exports.confirmed = confirmed;

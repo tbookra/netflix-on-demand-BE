@@ -1,19 +1,26 @@
 const nodemailer = require('nodemailer');
 password = process.env.EMAIL_PASSWORD;
+NGROK_PATH = 'http://c5370eabd269.ngrok.io'
 
-const register_message =  {
-    subject: 'wellcome to NETFLIXonDEMAND',
-    text: 'You have successfully registered!',
-    html: '<b> wellcome abourd </b>',
-}
 
-const password_change_message =  {
-    subject: 'Your password has been successfuly chainged!',
-    text: 'You have successfully chainged your password!',
-    html: '<b> Now you can go back to enjoy our site </b>',
-}
+const sendEmail = async (user,type) =>{
+    const register_message =  {
+        subject: 'wellcome to NETFLIXonDEMAND',
+        text: 'You have successfully registered!',
+        html: `<b> wellcome abord ${user.full_name}</b><br>
+        <form action= "${NGROK_PATH}/auth/userConfirmation${user.email}" mothod="get" target="_self">
+        
+                <button>Confirm</button>
+                </form>
+        `,
+    };
+    
+    const password_change_message =  {
+        subject: 'Your password has been successfuly chainged!',
+        text: 'You have successfully chainged your password!',
+        html: '<b> Now you can go back to enjoy our site </b>',
+    };
 
-const sendEmail = async (userEmail,type) =>{
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         secure: false,
@@ -28,7 +35,7 @@ const sendEmail = async (userEmail,type) =>{
     
     let mailOptions = {
         from: 'netflixondemandproject@gmail.com',
-        to: userEmail,
+        to: user.email,
         subject: type === "register" ? register_message.subject : password_change_message.subject,
         text: type === "register" ? register_message.text : password_change_message.text,
         html: type === "register" ? register_message.html : password_change_message.html,

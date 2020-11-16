@@ -9,4 +9,8 @@ router.post("/login",passwordToModify, authController.login);
 
 router.post("/newPassword", authController.newPassword);
 
+router.get("/userConfirmation:email", authController.userConfirmation);
+
+router.get("/confirmed", authController.confirmed)
+
 module.exports = router;
