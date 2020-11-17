@@ -128,6 +128,7 @@ const nodemailer = require('../auth/nodeMailer');
         passwordLastModified: Date.now(),
         status: 'not_active',
       }});
+      res.status(200).json({deleted: true});
     }catch(e){
       console.log(e)
     }
