@@ -20,12 +20,6 @@ const nodemailer = require('../auth/nodeMailer');
       if (emailExist) return res.json({ error: "Email already exists" });
       await nodemailer.sendEmail(user, "register");
       res.json({confirm: 'confirm'})
-
-
-      
-      // const token = await JWT.generateToken(user._id, rememberMe);
-      // await nodemailer.sendEmail(email, "register");
-      // res.status(200).header("AuthToken", token).json({ token, userName:full_name });
   
     } catch (err) {
       res.status(500).json(err);
@@ -49,7 +43,7 @@ const nodemailer = require('../auth/nodeMailer');
         } else {
          
           
-            res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+            res.status(200).header("AuthToken", token).json({ token, userObj:user });
         
             
         }
@@ -72,7 +66,7 @@ const nodemailer = require('../auth/nodeMailer');
         req.session.changePassword = false;
         await Users.updateOne({email: email},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
         await nodemailer.sendEmail(email, "password");
-        res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+        res.status(200).header("AuthToken", token).json({ token, userObj:user });
      
         next()
     } catch (e) {
@@ -87,7 +81,7 @@ const nodemailer = require('../auth/nodeMailer');
       const token = await JWT.generateToken(user._id, false);
       req.session.emailConfirmed = user;
       // console.log(' req.session.emailConfirmed', req.session.emailConfirmed)
-      res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+      res.status(200).header("AuthToken", token).json({ token, userObj:user });
     }catch(e){
       console.log(e)
     }
@@ -111,7 +105,7 @@ const nodemailer = require('../auth/nodeMailer');
       // console.log('const', values.email, values.password) 
       const token = await JWT.generateToken(user._id, false);
      console.log('token', token, user.full_name);
-      res.status(200).header("AuthToken", token).json({ token, userName:user.full_name });
+      res.status(200).header("AuthToken", token).json({ token, userObj:user });
     }catch(e){
       console.log(e)
     }
