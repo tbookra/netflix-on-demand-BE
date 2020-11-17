@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 1024,
   },
+  status:{
+    type: String,
+    default: 'active',
+  },
   isMember:{
     type:Boolean,
     default:false

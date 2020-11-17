@@ -16,7 +16,7 @@ const nodemailer = require('../auth/nodeMailer');
     };
      try {
       await registerValidation(req.body);
-      const emailExist = await Users.findOne({ email });
+      const emailExist = await Users.findOne({$and:[{ email },{status: 'active'}]});
       if (emailExist) return res.json({ error: "Email already exists" });
       await nodemailer.sendEmail(user, "register");
       res.json({confirm: 'confirm'})
@@ -28,11 +28,11 @@ const nodemailer = require('../auth/nodeMailer');
   
   const login = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
-    
+    console.log('req.body',req.body)
     
     try {
         await loginValidation(req.body);
-        const user = await Users.findOne({ email });
+        const user = await Users.findOne({$and:[{ email },{status: 'active'}]});
         if (!user) return res.json({ error: "Email or Password are invalid" });
         let comperdPassword = await bcrypt.checkPassword(password, user.password);
         if (!comperdPassword)
@@ -57,14 +57,14 @@ const nodemailer = require('../auth/nodeMailer');
     const {  new_password, email } = req.body;
     try {
         await newPasswordValidation(req.body);
-        let user = await Users.findOne({ email });
-        if (!user) return res.json({ error: "No such user exists" });
+        let user = await Users.findOne({$and:[{ email },{status: 'active'}]});
+        if (!user) return res.json({ error: "No such user exists. would you like to register?" });
         let comperdPassword = await bcrypt.checkPassword(new_password, user.password);
         if (comperdPassword) return res.json({ error: "You have to choose a new password!" });
         const newHashPassword = await bcrypt.hashPassword(new_password);
         const token = await JWT.generateToken(user._id, false);
         req.session.changePassword = false;
-        await Users.updateOne({email: email},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
+        await Users.updateOne({_id: user._id},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
         await nodemailer.sendEmail(email, "password");
         res.status(200).header("AuthToken", token).json({ token, userObj:user });
      
@@ -90,22 +90,44 @@ const nodemailer = require('../auth/nodeMailer');
   const confirmed  = async (req, res, next) => {
    
     try{
-      // console.log('req.session.values',module.exports.newUserValues)
+      console.log('module.exports.newUserValues',module.exports.newUserValues)
       const values = module.exports.newUserValues;
       const {full_name,email,password} = values
       // let user = await Users.findOne({ email:values.email });
       // console.log('user', user)
       const hashPassword = await bcrypt.hashPassword(password);
-      const user = await new Users({
+      const oldUser = await Users.findOne({ email });
+      console.log('oldUser',oldUser)
+      const user = !oldUser ? await new Users({
         full_name,
         email,
         password: hashPassword,
         passwordLastModified: Date.now(),
-      }).save();
-      // console.log('const', values.email, values.password) 
-      const token = await JWT.generateToken(user._id, false);
-     console.log('token', token, user.full_name);
-      res.status(200).header("AuthToken", token).json({ token, userObj:user });
+      }).save() :
+      await Users.updateOne({_id: oldUser._id},{$set:{
+        password:hashPassword,
+        passwordLastModified: Date.now(),
+        full_name:full_name,
+        status: 'active',
+      }});
+      const newUser = await Users.findOne({ email });
+      console.log('user confirm',newUser) 
+      const token = await JWT.generateToken(newUser._id, false);
+      res.status(200).header("AuthToken", token).json({ token, userObj:newUser });
+    }catch(e){
+      console.log(e)
+    }
+  };
+
+  const deleteUser = async (req, res, next) => {
+    const {email} = req.params;
+    try{
+      const user = await Users.findOne({ email });
+      await Users.updateOne({_id: user._id},{$set:{
+        password:"",
+        passwordLastModified: Date.now(),
+        status: 'not_active',
+      }});
     }catch(e){
       console.log(e)
     }
@@ -116,3 +138,4 @@ const nodemailer = require('../auth/nodeMailer');
   module.exports.newPassword = newPassword;
   module.exports.userConfirmation = userConfirmation;
   module.exports.confirmed = confirmed;
+  module.exports.deleteUser = deleteUser;

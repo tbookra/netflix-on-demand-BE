@@ -11,6 +11,8 @@ router.post("/newPassword", authController.newPassword);
 
 router.get("/userConfirmation:email", authController.userConfirmation);
 
-router.get("/confirmed", authController.confirmed)
+router.get("/confirmed", authController.confirmed);
+
+router.get("/deleteUser:email", authController.deleteUser);
 
 module.exports = router;
