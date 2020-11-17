@@ -1,3 +1,4 @@
+const { boolean } = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const movie = new mongoose.Schema({
@@ -31,7 +32,6 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
-  
 
   purchasedMovies:[movie],
 

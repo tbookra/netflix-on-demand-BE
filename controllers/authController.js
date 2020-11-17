@@ -7,8 +7,10 @@ const JWT = require("../auth/jwt");
 const e = require("express");
 const nodemailer = require('../auth/nodeMailer');
 
+
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
+    req.session.emailConfirmed = false;
     module.exports.newUserValues = req.body;
     const user = {
       full_name,
@@ -28,7 +30,6 @@ const nodemailer = require('../auth/nodeMailer');
   
   const login = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
-    console.log('req.body',req.body)
     
     try {
         await loginValidation(req.body);
@@ -41,11 +42,7 @@ const nodemailer = require('../auth/nodeMailer');
         if(req.session.changePassword){
         return res.json({ error: "need to change password" });
         } else {
-         
-          
-            res.status(200).header("AuthToken", token).json({ token, userObj:user });
-        
-            
+          res.status(200).header("AuthToken", token).json({ token, userObj:user });
         }
         next()
     } catch (e) {
@@ -74,46 +71,41 @@ const nodemailer = require('../auth/nodeMailer');
     }
   };
 
-  const userConfirmation = async (req, res, next) => {
+  const userConfirmation =  (req, res, next) => {
     const {email} = req.params;
-    try{
-      let user = await Users.findOne({ email });
-      const token = await JWT.generateToken(user._id, false);
-      req.session.emailConfirmed = user;
-      // console.log(' req.session.emailConfirmed', req.session.emailConfirmed)
-      res.status(200).header("AuthToken", token).json({ token, userObj:user });
-    }catch(e){
-      console.log(e)
-    }
-  }
+    req.session.emailConfirmed = true;
+      }
 
   const confirmed  = async (req, res, next) => {
-   
+  
     try{
-      console.log('module.exports.newUserValues',module.exports.newUserValues)
+      let hasEmailConfirmed = req.session.emailConfirmed;
+      console.log('hasEmailConfirmed',hasEmailConfirmed)
       const values = module.exports.newUserValues;
       const {full_name,email,password} = values
-      // let user = await Users.findOne({ email:values.email });
-      // console.log('user', user)
-      const hashPassword = await bcrypt.hashPassword(password);
-      const oldUser = await Users.findOne({ email });
-      console.log('oldUser',oldUser)
-      const user = !oldUser ? await new Users({
-        full_name,
-        email,
-        password: hashPassword,
-        passwordLastModified: Date.now(),
-      }).save() :
-      await Users.updateOne({_id: oldUser._id},{$set:{
-        password:hashPassword,
-        passwordLastModified: Date.now(),
-        full_name:full_name,
-        status: 'active',
-      }});
-      const newUser = await Users.findOne({ email });
-      console.log('user confirm',newUser) 
-      const token = await JWT.generateToken(newUser._id, false);
-      res.status(200).header("AuthToken", token).json({ token, userObj:newUser });
+      if(!hasEmailConfirmed) {
+       return res.status(400).json({ error: 'email has not confirmed yet' })
+      } else {
+        const hashPassword = await bcrypt.hashPassword(password);
+        const oldUser = await Users.findOne({ email });
+        const user = !oldUser ? await new Users({
+          full_name,
+          email,
+          password: hashPassword,
+          passwordLastModified: Date.now(),
+        }).save() :
+        await Users.updateOne({_id: oldUser._id},{$set:{
+          password:hashPassword,
+          passwordLastModified: Date.now(),
+          full_name:full_name,
+          status: 'active',
+        }});
+        const newUser = await Users.findOne({ email });
+        console.log('user confirm',newUser) 
+        const token = await JWT.generateToken(newUser._id, false);
+        res.status(200).header("AuthToken", token).json({ token, userObj:newUser });
+      }
+      
     }catch(e){
       console.log(e)
     }
@@ -123,6 +115,7 @@ const nodemailer = require('../auth/nodeMailer');
     const {email} = req.params;
     try{
       const user = await Users.findOne({ email });
+      // await Users.deleteOne({email})
       await Users.updateOne({_id: user._id},{$set:{
         password:"",
         passwordLastModified: Date.now(),

@@ -26,6 +26,8 @@ mongoose.connection.on("error", (err) => {
   console.log("error connecting to MONGO", err);
 })
 
+module.exports.emailConfirmed = false;
+
 app.use(logger("dev"));
 app.use(cors());
 app.use(express.json());
@@ -38,6 +40,7 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
 app.use("/movie",tokenVerify, movieRouter);
+
 
 
 module.exports = app;

@@ -10,7 +10,7 @@ const sendEmail = async (user,type) =>{
         html: `<b> wellcome abord ${user.full_name}</b><br>
         <form action= "${NGROK_PATH}/auth/userConfirmation${user.email}" mothod="get" target="_self">
         
-                <button style={color:red}>Confirm</button>
+                <button>Confirm</button>
                 </form>
         `,
     };
