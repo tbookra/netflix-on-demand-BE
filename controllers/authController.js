@@ -6,11 +6,13 @@ const bcrypt = require("../auth/bcrypt");
 const JWT = require("../auth/jwt");
 const e = require("express");
 const nodemailer = require('../auth/nodeMailer');
+const { connect } = require("mongoose");
 
 
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
-    req.session.emailConfirmed = false;
+    // req.session.emailConfirmed = false;
+    req.session.userInfo = req.body;
     module.exports.newUserValues = req.body;
     const user = {
       full_name,
@@ -71,18 +73,26 @@ const nodemailer = require('../auth/nodeMailer');
     }
   };
 
-  const userConfirmation =  (req, res, next) => {
-    const {email} = req.params;
-    req.session.emailConfirmed = true;
-      }
+  // const userConfirmation =  (req, res, next) => {
+  //   try{
+  //     req.session.emailConfirmed = true;
+  //   console.log('req.session.emailConfirmed',req.session.emailConfirmed)
+  //   res.status(200).json({connected:true})
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   // const {email} = req.params;
+  //   // console.log('params', email)
+    
+  //     }
 
   const confirmed  = async (req, res, next) => {
-  
+   
+    console.log('req.session.userInfo from confirmed',req.session.userInfo)
     try{
-      let hasEmailConfirmed = req.session.emailConfirmed;
-      console.log('hasEmailConfirmed',hasEmailConfirmed)
-      const values = module.exports.newUserValues;
-      const {full_name,email,password} = values
+      
+      // const values = module.exports.newUserValues;
+      const {full_name,email,password} = req.session.userInfo
       if(!hasEmailConfirmed) {
        return res.status(400).json({ error: 'email has not confirmed yet' })
       } else {
@@ -130,6 +140,6 @@ const nodemailer = require('../auth/nodeMailer');
   module.exports.register = register;
   module.exports.login = login;
   module.exports.newPassword = newPassword;
-  module.exports.userConfirmation = userConfirmation;
+  // module.exports.userConfirmation = userConfirmation;
   module.exports.confirmed = confirmed;
   module.exports.deleteUser = deleteUser;

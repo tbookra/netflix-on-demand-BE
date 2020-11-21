@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 password = process.env.EMAIL_PASSWORD;
-NGROK_PATH = 'http://c5370eabd269.ngrok.io'
+NGROK_PATH = process.env.NGROK_PATH;
 
 
 const sendEmail = async (user,type) =>{
@@ -8,7 +8,7 @@ const sendEmail = async (user,type) =>{
         subject: 'wellcome to NETFLIXonDEMAND',
         text: 'You have successfully registered!',
         html: `<b> wellcome abord ${user.full_name}</b><br>
-        <form action= "${NGROK_PATH}/auth/userConfirmation${user.email}" mothod="get" target="_self">
+        <form action= "${NGROK_PATH}/auth/ConfirmationAccepted" mothod="get" target="_self">
         
                 <button>Confirm</button>
                 </form>
