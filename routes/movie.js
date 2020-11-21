@@ -6,8 +6,21 @@ const Users = require("../models/mongoDB/User");
 router.get(
   "/checkIfMovieAccessible/:movieId",
   passwordToModify,
-  movieController.getMovie
+  movieController.checkIfMovieAccessible
 );
+
+router.get("/getAccessibleMovies", async (req, res) => {
+  const { user_id } = req.session;
+  try {
+    const user = await Users.findById(user_id);
+    const isMember = await user.get("isMember");
+    if (isMember) return res.json({ isMember });
+    const accessibleMovies = await user.get("purchasedMovies");
+    res.json({ accessibleMovies });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 router.post("/addMovie", movieController.addMovie);
 
@@ -17,7 +30,7 @@ router.post("/membership/:type", async (req, res) => {
   try {
     const user = await Users.findById(user_id);
     user.isMember = type;
-    user.save();
+    await user.save();
     res.json({ membership: type });
   } catch (err) {
     console.log(err);
