@@ -11,15 +11,14 @@ router.get(
 
 router.post("/addMovie", movieController.addMovie);
 
-router.post("/buyMembership", async (req, res) => {
-  const { email } = req.body;
+router.post("/membership/:type", async (req, res) => {
+  const { user_id } = req.session;
+  const type = req.params.type === "buy" ? true : false;
   try {
-    const user = await Users.findOne({ email });
-    const isMember = user.get("isMember");
-    if (isMember) return res.json({ membership: "you already a member" });
-    user.isMember = true;
+    const user = await Users.findById(user_id);
+    user.isMember = type;
     user.save();
-    res.json({ membership: "successfully member" });
+    res.json({ membership: type });
   } catch (err) {
     console.log(err);
   }
