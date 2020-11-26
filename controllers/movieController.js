@@ -19,7 +19,8 @@ const checkIfMovieAccessible = async (req, res) => {
 };
 
 const addMovie = async (req, res) => {
-  const { movieId } = req.body;
+  const { movieId, posterPath } = req.body;
+  console.log(posterPath);
   const { user_id } = req.session;
   try {
     const user = await Users.findById(user_id);
@@ -27,7 +28,7 @@ const addMovie = async (req, res) => {
       (movie) => movie.movieId === movieId
     );
     if (isMovieInList.length === 0) {
-      user.purchasedMovies = [...user.purchasedMovies, { movieId }];
+      user.purchasedMovies = [...user.purchasedMovies, { movieId, posterPath }];
       await user.save();
       res.status(200).json({ added: true });
     } else {
