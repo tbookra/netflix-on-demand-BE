@@ -6,20 +6,32 @@ const Users = require("../models/mongoDB/User");
 router.get(
   "/checkIfMovieAccessible/:movieId",
   passwordToModify,
-  movieController.getMovie
+  movieController.checkIfMovieAccessible
 );
+
+router.get("/getAccessibleMovies", async (req, res) => {
+  const { user_id } = req.session;
+  try {
+    const user = await Users.findById(user_id);
+    const isMember = await user.get("isMember");
+    if (isMember) return res.json({ isMember });
+    const accessibleMovies = await user.get("purchasedMovies");
+    res.json({ accessibleMovies });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 router.post("/addMovie", movieController.addMovie);
 
-router.post("/buyMembership", async (req, res) => {
-  const { email } = req.body;
+router.post("/membership/:type", async (req, res) => {
+  const { user_id } = req.session;
+  const type = req.params.type === "buy" ? true : false;
   try {
-    const user = await Users.findOne({ email });
-    const isMember = user.get("isMember");
-    if (isMember) return res.json({ membership: "you already a member" });
-    user.isMember = true;
-    user.save();
-    res.json({ membership: "successfully member" });
+    const user = await Users.findById(user_id);
+    user.isMember = type;
+    await user.save();
+    res.json({ membership: type });
   } catch (err) {
     console.log(err);
   }

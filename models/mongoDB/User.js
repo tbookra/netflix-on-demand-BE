@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 
 const movie = new mongoose.Schema({
-  movieId:{
-    type:String,
-    max:255
-  }
-})
+  movieId: {
+    type: String,
+    max: 255,
+  },
+  posterPath: {
+    type: String,
+  },
+});
 
 const userSchema = new mongoose.Schema({
   full_name: {
@@ -23,13 +26,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 1024,
   },
-  isMember:{
-    type:Boolean,
-    default:false
+  isMember: {
+    type: Boolean,
+    default: false,
   },
-  
 
-  purchasedMovies:[movie],
+  purchasedMovies: [movie],
 
   registrationDate: {
     type: Date,
@@ -37,8 +39,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordLastModified: {
     type: Date,
-    
-  }
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
