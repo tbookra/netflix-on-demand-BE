@@ -10,21 +10,11 @@ const { connect } = require("mongoose");
 
 
  const register = async (req, res) => {
-    const { full_name, email, password, rememberMe } = req.body;
-    // req.session.emailConfirmed = false;
-    // req.session.userInfo = req.body;
-    // module.exports.newUserValues = req.body;
-    // const user = {
-    //   full_name,
-    //   email
-    // };
+      const { full_name, email, password, rememberMe } = req.body;
      try {
       await registerValidation(req.body);
       const emailExist = await Users.findOne({$and:[{ email },{status: 'active'},{isConfirmed: true}]});
-      // await Users.findOne({$and:[{ email },{status: 'not_active'}]});
-      // ,{status: 'active'},{isConfirmed: true}
       if (emailExist) return res.json({ error: "Email already exists" });
-
       const hashPassword = await bcrypt.hashPassword(password);
       const oldUser = await Users.findOne({ email });
       const user = !oldUser ? await new Users({
@@ -49,9 +39,9 @@ const { connect } = require("mongoose");
     }
   }
   
+
   const login = async (req, res, next) => {
-    const { email, password, rememberMe } = req.body;
-    
+        const { email, password, rememberMe } = req.body;
     try {
         await loginValidation(req.body);
         let user = await Users.findOne({$and:[{ email },{status: 'active'}]});
@@ -130,6 +120,5 @@ const { connect } = require("mongoose");
   module.exports.register = register;
   module.exports.login = login;
   module.exports.newPassword = newPassword;
-  // module.exports.userConfirmation = userConfirmation;
   module.exports.confirmed = confirmed;
   module.exports.deleteUser = deleteUser;
