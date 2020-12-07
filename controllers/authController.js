@@ -20,7 +20,7 @@ const { connect } = require("mongoose");
     // };
      try {
       await registerValidation(req.body);
-      const emailExist = false
+      const emailExist = await Users.findOne({$and:[{ email },{status: 'active'},{isConfirmed: true}]});
       // await Users.findOne({$and:[{ email },{status: 'not_active'}]});
       // ,{status: 'active'},{isConfirmed: true}
       if (emailExist) return res.json({ error: "Email already exists" });
@@ -94,37 +94,17 @@ const { connect } = require("mongoose");
     }
   };
 
-  // const userConfirmation =  (req, res, next) => {
-  //   try{
-  //     req.session.emailConfirmed = true;
-  //   console.log('req.session.emailConfirmed',req.session.emailConfirmed)
-  //   res.status(200).json({connected:true})
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  //   // const {email} = req.params;
-  //   // console.log('params', email)
-    
-  //     }
+ 
 
   const confirmed  = async (req, res, next) => {
+        const {email} = req.params;  
    
-    console.log('req.session.userInfo from confirmed',req.session.userInfo)
     try{
-      
-      // const values = module.exports.newUserValues;
-      const {full_name,email,password} = req.session.userInfo
-      if(!hasEmailConfirmed) {
-       return res.status(400).json({ error: 'email has not confirmed yet' })
-      } else {
-        
-        // TODO: change this to the new logic
         const newUser = await Users.findOne({ email });
-        console.log('user confirm',newUser) 
+        await Users.updateOne({_id: newUser._id},{$set:{status: 'active', isConfirmed: true}});
         const token = await JWT.generateToken(newUser._id, false);
         res.status(200).header("AuthToken", token).json({ token, userObj:newUser });
-      }
-      
+     
     }catch(e){
       console.log(e)
     }
@@ -139,6 +119,7 @@ const { connect } = require("mongoose");
         password:"",
         passwordLastModified: Date.now(),
         status: 'not_active',
+        isConfirmed: false,
       }});
       res.status(200).json({deleted: true});
     }catch(e){

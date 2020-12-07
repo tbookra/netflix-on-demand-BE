@@ -4,12 +4,12 @@ const NGROK_PATH_CLIENT = process.env.NGROK_PATH_CLIENT;
 
 
 const sendEmail = async (full_name, email,type) =>{
-   
+   console.log('email', email)
     const register_message =  {
         subject: 'wellcome to NETFLIXonDEMAND',
         text: 'You have successfully registered!',
         html: `<b> wellcome abord ${full_name}</b><br>
-        <form action= "${NGROK_PATH_CLIENT}/auth/ConfirmationAccepted/?${email}" mothod="get" target="_self">
+        <form action= "${NGROK_PATH_CLIENT}/auth/ConfirmationAccepted/${email}" mothod="get" target="_self">
         
                 <button>Confirm</button>
                 </form>
