@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'active',
   },
+  isConfirmed:{
+    type:Boolean,
+    default:false
+  },
   isMember:{
     type:Boolean,
     default:false

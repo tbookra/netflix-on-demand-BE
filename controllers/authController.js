@@ -12,17 +12,36 @@ const { connect } = require("mongoose");
  const register = async (req, res) => {
     const { full_name, email, password, rememberMe } = req.body;
     // req.session.emailConfirmed = false;
-    req.session.userInfo = req.body;
-    module.exports.newUserValues = req.body;
-    const user = {
-      full_name,
-      email
-    };
+    // req.session.userInfo = req.body;
+    // module.exports.newUserValues = req.body;
+    // const user = {
+    //   full_name,
+    //   email
+    // };
      try {
       await registerValidation(req.body);
-      const emailExist = await Users.findOne({$and:[{ email },{status: 'active'}]});
+      const emailExist = false
+      // await Users.findOne({$and:[{ email },{status: 'not_active'}]});
+      // ,{status: 'active'},{isConfirmed: true}
       if (emailExist) return res.json({ error: "Email already exists" });
-      await nodemailer.sendEmail(user, "register");
+
+      const hashPassword = await bcrypt.hashPassword(password);
+      const oldUser = await Users.findOne({ email });
+      const user = !oldUser ? await new Users({
+        full_name,
+        email,
+        password: hashPassword,
+        passwordLastModified: Date.now(),
+      }).save() :
+      await Users.updateOne({_id: oldUser._id},{$set:{
+        password:hashPassword,
+        passwordLastModified: Date.now(),
+        full_name:full_name,
+        status: 'not_active',
+        isConfirmed: false,
+      }});
+
+      await nodemailer.sendEmail(full_name,email, "register");
       res.json({confirm: 'confirm'})
   
     } catch (err) {
@@ -35,8 +54,10 @@ const { connect } = require("mongoose");
     
     try {
         await loginValidation(req.body);
-        const user = await Users.findOne({$and:[{ email },{status: 'active'}]});
+        let user = await Users.findOne({$and:[{ email },{status: 'active'}]});
         if (!user) return res.json({ error: "Email or Password are invalid" });
+        user = await Users.findOne({$and:[{ email },{isConfirmed: true}]});
+        if (!user) return res.json({ error: "This Email hasn't been confirmed yet!" });
         let comperdPassword = await bcrypt.checkPassword(password, user.password);
         if (!comperdPassword)
         return res.json({ error: "Email or Password are invalid" });
@@ -96,20 +117,8 @@ const { connect } = require("mongoose");
       if(!hasEmailConfirmed) {
        return res.status(400).json({ error: 'email has not confirmed yet' })
       } else {
-        const hashPassword = await bcrypt.hashPassword(password);
-        const oldUser = await Users.findOne({ email });
-        const user = !oldUser ? await new Users({
-          full_name,
-          email,
-          password: hashPassword,
-          passwordLastModified: Date.now(),
-        }).save() :
-        await Users.updateOne({_id: oldUser._id},{$set:{
-          password:hashPassword,
-          passwordLastModified: Date.now(),
-          full_name:full_name,
-          status: 'active',
-        }});
+        
+        // TODO: change this to the new logic
         const newUser = await Users.findOne({ email });
         console.log('user confirm',newUser) 
         const token = await JWT.generateToken(newUser._id, false);

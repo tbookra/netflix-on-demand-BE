@@ -1,14 +1,15 @@
 const nodemailer = require('nodemailer');
-password = process.env.EMAIL_PASSWORD;
-NGROK_PATH = process.env.NGROK_PATH;
+const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const NGROK_PATH_CLIENT = process.env.NGROK_PATH_CLIENT;
 
 
-const sendEmail = async (user,type) =>{
+const sendEmail = async (full_name, email,type) =>{
+   
     const register_message =  {
         subject: 'wellcome to NETFLIXonDEMAND',
         text: 'You have successfully registered!',
-        html: `<b> wellcome abord ${user.full_name}</b><br>
-        <form action= "${NGROK_PATH}/auth/ConfirmationAccepted" mothod="get" target="_self">
+        html: `<b> wellcome abord ${full_name}</b><br>
+        <form action= "${NGROK_PATH_CLIENT}/auth/ConfirmationAccepted/?${email}" mothod="get" target="_self">
         
                 <button>Confirm</button>
                 </form>
@@ -26,7 +27,7 @@ const sendEmail = async (user,type) =>{
         secure: false,
         auth: {
             user:'netflixondemandproject@gmail.com',
-            pass: password,
+            pass: EMAIL_PASSWORD,
         },
         tls: {
             rejectUnauthorized:false
@@ -35,7 +36,7 @@ const sendEmail = async (user,type) =>{
     
     let mailOptions = {
         from: 'netflixondemandproject@gmail.com',
-        to: user.email,
+        to: email,
         subject: type === "register" ? register_message.subject : password_change_message.subject,
         text: type === "register" ? register_message.text : password_change_message.text,
         html: type === "register" ? register_message.html : password_change_message.html,
