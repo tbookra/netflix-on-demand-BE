@@ -100,6 +100,19 @@ const { connect } = require("mongoose");
     }
   };
 
+  const emailResend  = async (req, res, next) => {
+    console.log('req.body',req.body)
+    const {userEmail} = req.body;
+    console.log('userEmail',userEmail)
+      try{
+        const user = await Users.findOne({ email:userEmail });
+        console.log('userrrr', user)
+        await nodemailer.sendEmail(user.full_name,userEmail, "register");
+      }catch(e){
+            console.log(e)
+          }
+  }
+
   const deleteUser = async (req, res, next) => {
     const {email} = req.params;
     try{
@@ -121,4 +134,5 @@ const { connect } = require("mongoose");
   module.exports.login = login;
   module.exports.newPassword = newPassword;
   module.exports.confirmed = confirmed;
+  module.exports.emailResend = emailResend;
   module.exports.deleteUser = deleteUser;

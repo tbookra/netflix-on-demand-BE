@@ -13,6 +13,8 @@ router.post("/newPassword", authController.newPassword);
 
 router.get("/confirmed/:email", authController.confirmed);
 
+router.post("/resend", authController.emailResend);
+
 router.get("/deleteUser/:email", authController.deleteUser);
 
 module.exports = router;
