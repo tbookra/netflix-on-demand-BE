@@ -30,8 +30,8 @@ const { connect } = require("mongoose");
         status: 'not_active',
         isConfirmed: false,
       }});
-
-      await nodemailer.sendEmail(full_name, email, rememberMe, "register");
+      const userObj = {full_name, email, rememberMe}
+      await nodemailer.sendEmail(userObj, "register");
       res.json({confirm: 'confirm'})
   
     } catch (err) {
@@ -75,7 +75,12 @@ const { connect } = require("mongoose");
         const token = await JWT.generateToken(user._id, false);
         req.session.changePassword = false;
         await Users.updateOne({_id: user._id},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
-        await nodemailer.sendEmail(user.full_name,email,"false" ,"password");
+        const userObj = {
+          full_name: user.full_name,
+          email,
+          rememberMe: "false",
+        }
+        await nodemailer.sendEmail(userObj ,"password");
         res.status(200).header("AuthToken", token).json({ token, userObj:user });
      
         next()
@@ -104,7 +109,12 @@ const { connect } = require("mongoose");
     const {userEmail,rememberMe} = req.body;
       try{
         const user = await Users.findOne({ email:userEmail });
-        await nodemailer.sendEmail(user.full_name,userEmail, rememberMe, "register");
+        const userObj = {
+          full_name: user.full_name,
+          email: userEmail,
+          rememberMe,
+        }
+        await nodemailer.sendEmail(userObj, "register");
       }catch(e){
             console.log(e)
           }
