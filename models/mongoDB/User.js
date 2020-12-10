@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 1024,
   },
-  status:{
+    status:{
     type: String,
     default: 'active',
   },

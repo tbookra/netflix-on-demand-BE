@@ -31,7 +31,7 @@ const { connect } = require("mongoose");
         isConfirmed: false,
       }});
 
-      await nodemailer.sendEmail(full_name,email, "register");
+      await nodemailer.sendEmail(full_name, email, rememberMe, "register");
       res.json({confirm: 'confirm'})
   
     } catch (err) {
@@ -75,7 +75,7 @@ const { connect } = require("mongoose");
         const token = await JWT.generateToken(user._id, false);
         req.session.changePassword = false;
         await Users.updateOne({_id: user._id},{$set:{password:newHashPassword, passwordLastModified: Date.now()}});
-        await nodemailer.sendEmail(email, "password");
+        await nodemailer.sendEmail(user.full_name,email,"false" ,"password");
         res.status(200).header("AuthToken", token).json({ token, userObj:user });
      
         next()
@@ -87,12 +87,12 @@ const { connect } = require("mongoose");
  
 
   const confirmed  = async (req, res, next) => {
-        const {email} = req.params;  
+        const {email,rememberMe} = req.params;  
    
     try{
         const newUser = await Users.findOne({ email });
         await Users.updateOne({_id: newUser._id},{$set:{status: 'active', isConfirmed: true}});
-        const token = await JWT.generateToken(newUser._id, false);
+        const token = await JWT.generateToken(newUser._id, rememberMe);
         res.status(200).header("AuthToken", token).json({ token, userObj:newUser });
      
     }catch(e){
@@ -101,13 +101,10 @@ const { connect } = require("mongoose");
   };
 
   const emailResend  = async (req, res, next) => {
-    console.log('req.body',req.body)
-    const {userEmail} = req.body;
-    console.log('userEmail',userEmail)
+    const {userEmail,rememberMe} = req.body;
       try{
         const user = await Users.findOne({ email:userEmail });
-        console.log('userrrr', user)
-        await nodemailer.sendEmail(user.full_name,userEmail, "register");
+        await nodemailer.sendEmail(user.full_name,userEmail, rememberMe, "register");
       }catch(e){
             console.log(e)
           }

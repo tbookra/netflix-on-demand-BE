@@ -11,7 +11,7 @@ router.post("/newPassword", authController.newPassword);
 
 // router.get("/userConfirmation", authController.userConfirmation);
 
-router.get("/confirmed/:email", authController.confirmed);
+router.get("/confirmed/:email/:rememberMe", authController.confirmed);
 
 router.post("/resend", authController.emailResend);
 
