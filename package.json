@@ -19,7 +19,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.7",
     "morgan": "~1.9.1",
-    "mysql2": "^2.2.5"
+    "mysql2": "^2.2.5",
+    "nodemailer": "^6.4.16"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

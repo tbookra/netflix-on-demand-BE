@@ -1,16 +1,13 @@
 const Users = require("../models/mongoDB/User");
 
 module.exports = async (req, res, next) => {
-  const { user_id } = req.session;
-  const { email } = req.body;
-  console.log("reqq", req.session);
-  try {
-    const user1 = user_id
-      ? await Users.findById(user_id)
-      : await Users.findOne({ email: email });
-    if (email && !user1) {
-      return res.json({ error: "Invalid email or password" });
-    }
+  const {user_id} = req.session
+  const {email} = req.body
+  
+  try{
+    const user1 = user_id ? await Users.findById(user_id) : await Users.findOne({email:email});
+    if(email && !user1) {return res.json({ error: "Invalid email or password" })}
+
     const DATE_TO_DAYS = 60 * 60 * 24 * 1000;
     const DAYS_TO_PASSWORD_MODIFFICATION = process.env.PASSWORD_TO_MODIFY;
     let LastPasswordModification = user1.passwordLastModified / DATE_TO_DAYS;

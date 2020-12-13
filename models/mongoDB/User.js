@@ -1,3 +1,4 @@
+const { boolean } = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const movie = new mongoose.Schema({
@@ -26,13 +27,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 1024,
   },
-  isMember: {
-    type: Boolean,
-    default: false,
+    status:{
+    type: String,
+    default: 'active',
   },
-
+  isConfirmed:{
+    type:Boolean,
+    default:false
+  },
+  isMember:{
+    type:Boolean,
+    default:false
+  },
+  
   purchasedMovies: [movie],
-
+  
   registrationDate: {
     type: Date,
     default: Date.now,
