@@ -2,11 +2,14 @@ const { boolean } = require("@hapi/joi");
 const mongoose = require("mongoose");
 
 const movie = new mongoose.Schema({
-  movieId:{
-    type:String,
-    max:255
-  }
-})
+  movieId: {
+    type: String,
+    max: 255,
+  },
+  posterPath: {
+    type: String,
+  },
+});
 
 const userSchema = new mongoose.Schema({
   full_name: {
@@ -36,17 +39,16 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
-
-  purchasedMovies:[movie],
-
+  
+  purchasedMovies: [movie],
+  
   registrationDate: {
     type: Date,
     default: Date.now,
   },
   passwordLastModified: {
     type: Date,
-    
-  }
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
