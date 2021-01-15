@@ -9,8 +9,18 @@ router.get(
   movieController.checkIfMovieAccessible
 );
 
-router.get("/getAccessibleMovies", async (req, res) => {
+router.get("/getAccessibleMovies/:page", async (req, res) => {
+  const PAGE_OFFSET = 8;
+  let currentPage = 1;
   const { user_id } = req.session;
+  const { page } = req.params;
+  if (!page || page < 1) {
+    currentPage = 1;
+  } else {
+    currentPage = page;
+  }
+  let start_index = (currentPage - 1) * PAGE_OFFSET;
+  let end_index = start_index + PAGE_OFFSET;
   try {
     const user = await Users.findById(user_id);
     const isMember = await user.get("isMember");
