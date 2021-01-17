@@ -11,9 +11,10 @@ router.get(
 
 router.get("/getAccessibleMovies/:page", async (req, res) => {
   const PAGE_OFFSET = 8;
-  let currentPage = 1;
+  let currentPage;
   const { user_id } = req.session;
   const { page } = req.params;
+
   if (!page || page < 1) {
     currentPage = 1;
   } else {
@@ -26,7 +27,22 @@ router.get("/getAccessibleMovies/:page", async (req, res) => {
     const isMember = await user.get("isMember");
     if (isMember) return res.json({ isMember });
     const accessibleMovies = await user.get("purchasedMovies");
-    res.json({ accessibleMovies });
+    let currentMovies = accessibleMovies.slice(start_index, end_index);
+
+    let hasNextPage = false;
+    let hasPrevPage = false;
+
+    if (end_index < accessibleMovies.length) {
+      hasNextPage = true;
+    }
+    if (start_index > 0) {
+      hasPrevPage = true;
+    }
+    res.json({
+      currentMovies,
+      hasNextPage,
+      hasPrevPage,
+    });
   } catch (err) {
     console.log(err);
   }
